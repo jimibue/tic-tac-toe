@@ -1,9 +1,19 @@
-let state = {
-  players_turn: "X",
-  board: ["-", "-", "-", "-", "-", "-", "-", "-", "-"],
+// let defaultState = {
+//   players_turn: "X",
+//   board: ["-", "-", "-", "-", "-", "-", "-", "-", "-"],
+//   winner: false,
+// };
 
-  winner: false,
-};
+function getDefaultState() {
+  return {
+    players_turn: "X",
+    board: ["-", "-", "-", "-", "-", "-", "-", "-", "-"],
+    winner: false,
+  };
+}
+
+// let state = { ...defaultState, board: [...defaultState.board] };
+let state = { ...getDefaultState(), xWins: 0, yWins: 0 };
 
 function checkWinner() {
   return (
@@ -38,6 +48,11 @@ function handleSquareClicked(index) {
 
   if (checkWinner()) {
     state.winner = true;
+    if (state.players_turn === "X") {
+      state.xWins++;
+    } else {
+      state.yWins++;
+    }
     render();
     return;
   }
@@ -60,12 +75,19 @@ function renderSquares() {
   });
   return squaresHtml;
 }
+
+function restartGame() {
+  // state = { ...getDefaultState(), xWins: state.xWins, yWins: state.yWins };
+  state = { ...state, ...getDefaultState() };
+
+  render();
+}
 function getHeaderMessage() {
   const { winner, players_turn } = state;
   if (winner) {
     return `
     <p>${players_turn} won</p>
-    <p>restart</p>
+    <p onclick='restartGame()'>restart</p>
 `;
   } else {
     return `
@@ -81,10 +103,13 @@ function render() {
       ${getHeaderMessage()}
       <div class="board">
       ${renderSquares()}
+      <p>y has won ${state.yWins}</p>
+      <p>x has won ${state.xWins}</p>
       </div>
     </div>
   
   `;
   document.getElementById("app").innerHTML = htmlStr;
 }
+
 render();
